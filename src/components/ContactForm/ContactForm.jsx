@@ -1,5 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types'; // імпорт PropTypes для документування призначених типів властивостей, що передаються компонентам
+import { useDispatch, useSelector } from 'react-redux';
+import Notiflix from 'notiflix';
+import { nanoid } from 'nanoid';
+import { addContact, getContacts } from '../../redux/contactsSlice';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import {
@@ -33,19 +36,50 @@ const INITIAL_STATE = {
   number: '',
 }; // ініціалізація полів форми
 
-export const ContactForm = ({ onSubmit }) => {
-  
-  const formSubmit = e => {    
-    onSubmit(e);    
-    e.name = '';
-    e.number = '';
-  }; // виклик функції formSubmit призводить до передачі батьківському елементу значень полів name, number
+export const ContactForm = () => {
+  const contacts = useSelector(getContacts); // виклик хука useSelector дозволяє витягувати дані зі стану сховища Redux за допомогою функції селектора
+  const dispatch = useDispatch(); //виклик хука useDispatch повертає посилання на dispatch функцію зі сховища Redux, для відправки action за потреби
+
+  const addNewContact = e => {
+    if (
+      contacts.find(
+        item =>
+          item.name.toLowerCase().replaceAll(' ', '') ===
+          e.name.toLowerCase().replaceAll(' ', '')
+      ) // при порівнянні приводимо до нижнього регістру та видаляємо пробіли, для унеможливлення реєстрації однакових імен з додатковими пробілами
+    ) {
+      return Notiflix.Notify.warning(`Name ${e.name} is already in contacts`); // якщо в списку контактів існує контакт з таким ім'ям, вийти та вивести відповідне повідомлення
+    } else if (
+      contacts.find(
+        item =>
+          item.number
+            .replaceAll('+', '')
+            .replaceAll(' ', '')
+            .replaceAll('(', '')
+            .replaceAll(')', '')
+            .replaceAll('-', '') ===
+          e.number
+            .replaceAll('+', '')
+            .replaceAll(' ', '')
+            .replaceAll('(', '')
+            .replaceAll(')', '')
+            .replaceAll('-', '')
+      ) // при порівнянні видаляємо плюс, пробіли, дужки та тире, якщо вони є, для унеможливлення реєстрації однакових номерів з додатковими символами
+    ) {
+      return Notiflix.Notify.warning(`Number ${e.name} is already in contacts`); // якщо в списку контактів існує контакт з таким номером телефону, вийти та вивести відповідне повідомлення
+    }
+
+    dispatch(addContact({ id: nanoid(), name: e.name, number: e.number })); // інакше, додати цей новий контакт до сховища stor
+
+    e.name = ''; // очищення поля name форми
+    e.number = ''; // очищення поля number форми
+  }; // функція addContact додає новий контакт в сховище stor, що містить дерево стану нашого застосунку
 
   return (
     <Formik
       initialValues={INITIAL_STATE}
       validationSchema={schema}
-      onSubmit={formSubmit}
+      onSubmit={addNewContact}
     >
       <FormContainer>
         <Label htmlFor="name">
@@ -69,9 +103,5 @@ export const ContactForm = ({ onSubmit }) => {
         <Button type="submit">Add contact</Button>
       </FormContainer>
     </Formik>
-  ); // при настанні події onSubmit викликається функція formSubmit
+  ); // при настанні події onSubmit викликається функція addNewContact
 }; // повернення для рендеру розмітки форми (теги Label і Input для кожного поля форми та тег Button)
-
-ContactForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-}; // типізація (опис типів) пропсів компоненту класу ContactForm
