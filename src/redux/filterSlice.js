@@ -16,6 +16,5 @@ export const { setFilter } = filterSlice.actions; // експорт функці
 export const filterReducer = filterSlice.reducer; // експорт редюсера функції filterSlice 
 
 // Selectors
-export const getFilter = state => state.filter; // експорт функції селектору getFilter, що повертає значення зі стану сховища Redux (за допомогою виклика хука useSelector)
 
 

@@ -35,5 +35,5 @@ export const persistedReducer = persistReducer(
 export const { addContact, deleteContact } = сontactsSlice.actions; // експорт функцій редюсера (addContact, deleteContact) для генерації дій (actions) функції сontactsSlice
 
 // Selectors
-export const getContacts = state => state.phonebook.contacts; // експорт функції селектору getContacts. що повертає список контактів зі стану сховища Redux (за допомогою виклика хука useSelector)
+
 

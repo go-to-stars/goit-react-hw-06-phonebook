@@ -2,7 +2,8 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Notiflix from 'notiflix';
 import { nanoid } from 'nanoid';
-import { addContact, getContacts } from '../../redux/contactsSlice';
+import { addContact } from '../../redux/contactsSlice';
+import { getContacts } from '../../redux/selectors';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import {
